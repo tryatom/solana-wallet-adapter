@@ -98,3 +98,5 @@ We welcome contributions from the community to add support for new wallets or re
 ## 📄 License
 
 Licensed under the MIT License - see the `LICENSE` file for details.
+ 
+<!-- Documentation update 4 for solana-wallet-adapter -->
