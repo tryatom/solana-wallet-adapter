@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🔌 Universal Solana Wallet Adapter
 
-## Getting Started
+<div align="center">
+  <img src="https://img.shields.io/badge/Solana-14F195?style=for-the-badge&logo=solana&logoColor=black" alt="Solana" />
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+</div>
 
-First, run the development server:
+<br>
+
+A streamlined, secure, and highly customizable UI component library for integrating Solana wallets into your decentralized applications (dApps). Designed with modern React practices, it offers a frictionless onboarding experience for users connecting Phantom, Solflare, Backpack, and other SPL-compatible wallets.
+
+## 🚀 Features
+
+- **Multi-Wallet Support:** Out-of-the-box integrations for all major Solana wallets (Phantom, Solflare, Backpack, Glow, Brave).
+- **Responsive UI:** Beautifully crafted, accessible, and mobile-friendly connection modals and state management interfaces.
+- **Customizable Themes:** Effortlessly match your dApp's branding with dark/light modes and fully customizable CSS variables.
+- **Session Management:** Securely handles persistent connections and auto-reconnects across page loads.
+- **Transaction Signing:** Built-in hooks for seamless message signing and transaction approvals.
+- **Next.js Compatible:** Fully SSR/SSG compatible, ensuring flawless integration with Next.js 13+ (App Router & Pages Router).
+
+## 📦 Installation
+
+Install the core adapter and the UI package via your preferred package manager:
 
 ```bash
-npm run dev
+npm install @tryatom/solana-wallet-adapter @tryatom/solana-wallet-adapter-react-ui @solana/web3.js
 # or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+yarn add @tryatom/solana-wallet-adapter @tryatom/solana-wallet-adapter-react-ui @solana/web3.js
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠 Usage
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Wrap your application with the `ConnectionProvider` and `WalletProviderContexts` to inject wallet state throughout your React tree.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Example (Next.js / React)
 
-## Learn More
+```tsx
+import { useMemo } from 'react';
+import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
+import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
+import { WalletModalProvider, WalletMultiButton } from '@tryatom/solana-wallet-adapter-react-ui';
+import { clusterApiUrl } from '@solana/web3.js';
 
-To learn more about Next.js, take a look at the following resources:
+// Default styles
+import '@tryatom/solana-wallet-adapter-react-ui/styles.css';
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+export const App = ({ children }) => {
+    const network = WalletAdapterNetwork.Mainnet;
+    const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+    const wallets = useMemo(
+        () => [
+            new PhantomWalletAdapter(),
+            new SolflareWalletAdapter(),
+        ],
+        [network]
+    );
 
-## Deploy on Vercel
+    return (
+        <ConnectionProvider endpoint={endpoint}>
+            <WalletProvider wallets={wallets} autoConnect>
+                <WalletModalProvider>
+                    <div className="flex justify-end p-4">
+                        <WalletMultiButton /> {/* The interactive connection button */}
+                    </div>
+                    {children}
+                </WalletModalProvider>
+            </WalletProvider>
+        </ConnectionProvider>
+    );
+};
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🎨 Theming and Customization
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The UI components utilize CSS variables mapping to `--wallet-adapter-*`. You can easily override these in your global CSS to match your branding.
+
+```css
+:root {
+  --wallet-adapter-button-background: #14F195;
+  --wallet-adapter-button-color: #000000;
+  --wallet-adapter-modal-background: #1A1A1A;
+}
+```
+
+## 🛡 Security & Audits
+
+This library interacts heavily with user private keys (via the wallet extensions). We ensure that:
+- The adapter *never* requests or has access to raw private keys.
+- All transaction signing is delegated strictly to the secure iframe/extension of the target wallet.
+
+## 🤝 Contributing
+
+We welcome contributions from the community to add support for new wallets or refine the UI components. Please read our contributing guidelines before submitting PRs.
+
+## 📄 License
+
+Licensed under the MIT License - see the `LICENSE` file for details.
